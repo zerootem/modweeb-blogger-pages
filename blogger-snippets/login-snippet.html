@@ -1,0 +1,21 @@
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  📋 صفحة تسجيل الدخول — Angular App على GitHub Pages       ║
+  ║  رابط بلوجر: /p/login.html                                  ║
+  ║  الصق هذا الكود في صفحة بلوجر (HTML mode)                   ║
+  ╚══════════════════════════════════════════════════════════════╝
+  يعيد التوجيه تلقائياً إلى تطبيق Angular على GitHub Pages
+-->
+<script>
+(function(){
+  var returnUrl = window.location.href;
+  var cbu = new URLSearchParams(window.location.search).get('cbu');
+  if(cbu) returnUrl = decodeURIComponent(cbu);
+  var origin = encodeURIComponent(window.location.origin);
+  window.location.replace(
+    'https://zerootem.github.io/modweeb-blogger-pages/#/login'
+    + '?return=' + encodeURIComponent(returnUrl)
+    + '&origin=' + origin
+  );
+})();
+</script>

@@ -1,0 +1,170 @@
+// ── Tailwind ──────────────────────────────────────────────
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// ── Angular Material Custom Theme ────────────────────────
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$primary-palette: mat.define-palette((
+  50:   #eff6ff,
+  100:  #dbeafe,
+  200:  #bfdbfe,
+  300:  #93c5fd,
+  400:  #60a5fa,
+  500:  #3b82f6,
+  600:  #2563eb,
+  700:  #1d4ed8,
+  800:  #1e40af,
+  900:  #1e3a8a,
+  contrast: (
+    50:  rgba(0,0,0,0.87),
+    100: rgba(0,0,0,0.87),
+    200: rgba(0,0,0,0.87),
+    300: rgba(0,0,0,0.87),
+    400: rgba(0,0,0,0.87),
+    500: #fff,
+    600: #fff,
+    700: #fff,
+    800: #fff,
+    900: #fff,
+  )
+), 600, 400, 800);
+
+$app-theme: mat.define-light-theme((
+  color: (
+    primary: $primary-palette,
+    accent:  $primary-palette,
+  ),
+  typography: mat.define-typography-config(
+    $font-family: 'Cairo, system-ui, sans-serif',
+  ),
+  density: -1,
+));
+
+@include mat.all-component-themes($app-theme);
+
+// ── Global Reset & Base ──────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Cairo', system-ui, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  direction: rtl;
+}
+
+// ── Utility Classes ──────────────────────────────────────
+@layer components {
+
+  .mw-card {
+    @apply bg-white rounded-3xl border border-slate-200 shadow-card overflow-hidden;
+  }
+
+  .mw-btn-primary {
+    @apply flex items-center justify-center gap-2
+           w-full py-2.5 px-4 rounded-xl
+           bg-primary-600 text-white text-sm font-semibold
+           cursor-pointer border-none
+           transition-all duration-200
+           hover:bg-primary-700 hover:shadow-btn hover:-translate-y-px
+           active:translate-y-0 active:shadow-none
+           disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none;
+  }
+
+  .mw-btn-outline {
+    @apply flex items-center justify-center gap-2
+           w-full py-2.5 px-4 rounded-xl
+           bg-transparent text-slate-600 text-sm font-medium
+           cursor-pointer border border-slate-200
+           transition-all duration-200
+           hover:bg-slate-50;
+  }
+
+  .mw-btn-ghost {
+    @apply flex items-center justify-center gap-1.5
+           py-1.5 px-3 rounded-lg
+           bg-transparent text-slate-500 text-xs font-medium
+           cursor-pointer border border-slate-200
+           transition-all duration-150
+           hover:bg-slate-50;
+  }
+
+  .mw-badge {
+    @apply inline-flex items-center gap-1
+           px-2.5 py-0.5 rounded-full
+           text-xs font-semibold;
+  }
+
+  .mw-badge-primary {
+    @apply mw-badge bg-primary-50 text-primary-700;
+  }
+
+  .mw-badge-danger {
+    @apply mw-badge bg-red-50 text-red-600;
+  }
+
+  .mw-icon {
+    font-family: 'Material Icons Round';
+    font-style: normal;
+    font-size: 20px;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .mw-divider {
+    @apply border-none border-t border-slate-100 my-3;
+  }
+
+  .mw-input {
+    @apply w-full px-3 py-2 text-sm rounded-xl
+           border border-slate-200 bg-slate-50
+           text-slate-800 placeholder:text-slate-400
+           outline-none transition-all duration-150
+           focus:border-primary-400 focus:ring-2 focus:ring-primary-100 focus:bg-white;
+  }
+
+  .mw-label {
+    @apply block text-xs font-semibold text-slate-600 mb-1;
+  }
+
+  .mw-section-title {
+    @apply text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2;
+  }
+}
+
+// ── Material Overrides ───────────────────────────────────
+.mat-mdc-snack-bar-container {
+  direction: rtl;
+  font-family: 'Cairo', sans-serif !important;
+}
+
+.mdc-button { font-family: 'Cairo', sans-serif !important; }
+
+// ── Animations ───────────────────────────────────────────
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease forwards; }
+.animate-slide-up { animation: slideUp 0.4s ease forwards; }
+
+// ── Progress Bar ─────────────────────────────────────────
+.mw-progress-track {
+  @apply h-1 bg-slate-100 rounded-full overflow-hidden;
+
+  .mw-progress-bar {
+    @apply h-full bg-primary-600 rounded-full transition-all duration-[2.5s] ease-out;
+  }
+}

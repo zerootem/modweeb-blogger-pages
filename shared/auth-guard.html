@@ -1,0 +1,395 @@
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║           كود الحماية المشترك — auth-guard.html              ║
+  ║  أضف هذا الكود في أعلى أي صفحة تريد حمايتها بتسجيل الدخول  ║
+  ║                                                              ║
+  ║  طريقة الاستخدام:                                           ║
+  ║  1. الصق هذا الكود كاملاً في بداية صفحة بلوجر               ║
+  ║  2. عدّل PAGE_TITLE و PAGE_ICON حسب الصفحة                  ║
+  ║  3. الصق كود الأداة/الصفحة بعد هذا الكود مباشرة             ║
+  ╚══════════════════════════════════════════════════════════════╝
+
+  ⚙️ الإعدادات القابلة للتعديل:
+  - PAGE_TITLE : عنوان الصفحة المحمية (يظهر في البطاقة)
+  - PAGE_DESC  : وصف قصير لماذا تحتاج تسجيل دخول
+  - LOGO_URL   : رابط شعار الموقع
+  - SITE_NAME  : اسم الموقع
+  - TERMS_URL  : رابط صفحة الشروط
+  - PRIVACY_URL: رابط صفحة الخصوصية
+  - HOME_URL   : رابط الصفحة الرئيسية
+-->
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+/* ==================== إعدادات شاشة الحماية ==================== */
+html, body { margin: 0 !important; padding: 0 !important; }
+
+#auth-gate {
+  position: fixed;
+  inset: 0;
+  background: var(--bodyB, #f8fafc);
+  z-index: 999999;
+  display: none;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  font-family: inherit;
+}
+
+/* الهيدر */
+#auth-gate .ag-header {
+  background: var(--contentB, #fff);
+  border-bottom: 1px solid var(--contentL, #e3e7ef);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+#auth-gate .ag-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 1.25rem;
+  max-width: 1024px;
+  margin: 0 auto;
+}
+#auth-gate .ag-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--headC, #111);
+  font-size: 16px;
+  font-weight: 500;
+}
+#auth-gate .ag-logo img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* المحتوى المركزي */
+#auth-gate .ag-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  padding: 1.5rem 1rem;
+  flex: 1;
+}
+
+/* بطاقة الحماية */
+#auth-gate .ag-card {
+  background: var(--contentB, #fff);
+  border-radius: 20px;
+  border: 1px solid var(--contentL, #e3e7ef);
+  overflow: hidden;
+  max-width: 380px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+#auth-gate .ag-card-body {
+  padding: 24px 20px 16px;
+  text-align: center;
+}
+#auth-gate .ag-lock-icon {
+  width: 52px;
+  height: 52px;
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+#auth-gate .ag-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--headC, #111);
+  margin-bottom: 6px;
+}
+#auth-gate .ag-card-desc {
+  font-size: 13px;
+  color: var(--bodyC, #555);
+  line-height: 1.6;
+}
+#auth-gate .ag-card-footer {
+  border-top: 1px solid var(--contentL, #e3e7ef);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* الأزرار */
+#auth-gate .ag-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  transition: all .2s;
+}
+#auth-gate .ag-btn-primary {
+  background: var(--linkC, #2563eb);
+  color: #fff;
+}
+#auth-gate .ag-btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37,99,235,.3);
+}
+#auth-gate .ag-btn-outline {
+  background: 0 0;
+  border: 1px solid var(--contentL, #e3e7ef);
+  color: var(--bodyC, #555);
+}
+#auth-gate .ag-btn-outline:hover { background: var(--bodyB, #f8fafc); }
+
+/* الفوتر */
+#auth-gate .ag-footer {
+  border-top: 1px solid var(--contentL, #e3e7ef);
+  padding: 1rem 1.25rem;
+  margin-top: auto;
+}
+#auth-gate .ag-footer-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 1024px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+#auth-gate .ag-footer a {
+  font-size: 12px;
+  color: var(--bodyC, #888);
+  text-decoration: none;
+}
+#auth-gate .ag-footer a:hover { color: var(--headC, #111); }
+</style>
+
+<!--
+  ════════════════════════════════
+   شاشة الحماية (لا تعدّل HTML)
+   عدّل الإعدادات في السكريبت أدناه
+  ════════════════════════════════
+-->
+<div id="auth-gate">
+
+  <!-- الهيدر -->
+  <header class="ag-header">
+    <div class="ag-header-inner">
+      <a href="/" class="ag-logo" id="ag-logo-link">
+        <img id="ag-logo-img" src="" alt="">
+        <span id="ag-site-name"></span>
+      </a>
+    </div>
+  </header>
+
+  <!-- البطاقة المركزية -->
+  <div class="ag-content">
+    <div class="ag-card">
+      <div class="ag-card-body">
+        <div class="ag-lock-icon">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="var(--linkC,#2563eb)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="ag-card-title" id="ag-page-title">محتوى مقيّد</div>
+        <div class="ag-card-desc" id="ag-page-desc">
+          هذه الصفحة متاحة للأعضاء المسجلين فقط.<br>
+          سجّل دخولك للوصول إليها.
+        </div>
+      </div>
+      <div class="ag-card-footer">
+        <button class="ag-btn ag-btn-primary" onclick="showLoginPopup()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          تسجيل الدخول للمتابعة
+        </button>
+        <a href="/" id="ag-home-link" class="ag-btn ag-btn-outline">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          العودة للرئيسية
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- الفوتر -->
+  <footer class="ag-footer">
+    <div class="ag-footer-inner">
+      <a href="/" id="ag-footer-logo" style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--headC);">
+        <img id="ag-footer-img" src="" width="22" height="22" style="border-radius:4px;" alt="">
+        <span id="ag-footer-name"></span>
+      </a>
+      <a href="" id="ag-privacy-link">خصوصية</a>
+      <a href="" id="ag-terms-link">شروط</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ==================== سكريبت الحماية ==================== -->
+<script>
+(function () {
+  /* ╔══════════════════════════════════╗
+     ║  ⚙️  الإعدادات — عدّلها هنا     ║
+     ╚══════════════════════════════════╝ */
+  var CONFIG = {
+    PAGE_TITLE  : "مولد مقالات بلوجر",
+    PAGE_DESC   : "هذه الأداة متاحة للأعضاء المسجلين فقط.<br>سجّل دخولك للوصول إلى كامل الميزات.",
+    LOGO_URL    : "https://blogger.googleusercontent.com/img/a/AVvXsEjlFuMZRXWUpxZK7ZWolRDFXmZuTNvT2uMzetcU_d2gXpLqZ_3B1-vl18e31nhKyo0C_6SOVsxszrL_FxtJ4YCma9QwhNB0BLiTcBNdqYTAuXStazw9Tds6ylCz0IpSEGZ2MnjCSXIfMtYxcnOV8H3sKC5szT2c3FCYDG_DvVIFtTvsgrzRWGO4kFURiO4=s1600",
+    SITE_NAME   : "تصميم مودويب",
+    HOME_URL    : "/",
+    TERMS_URL   : "/p/terms.html",
+    PRIVACY_URL : "/p/privacy-policy.html"
+  };
+  /* ════════════════════════════════════ */
+
+  /* تعبئة النصوص الديناميكية */
+  function fill(id, prop) { var el = document.getElementById(id); if (el) el.innerHTML = CONFIG[prop]; }
+  function attr(id, attribute, prop) { var el = document.getElementById(id); if (el) el.setAttribute(attribute, CONFIG[prop]); }
+
+  fill("ag-page-title",  "PAGE_TITLE");
+  fill("ag-page-desc",   "PAGE_DESC");
+  fill("ag-site-name",   "SITE_NAME");
+  fill("ag-footer-name", "SITE_NAME");
+  attr("ag-logo-img",    "src",  "LOGO_URL");
+  attr("ag-logo-img",    "alt",  "SITE_NAME");
+  attr("ag-footer-img",  "src",  "LOGO_URL");
+  attr("ag-logo-link",   "href", "HOME_URL");
+  attr("ag-home-link",   "href", "HOME_URL");
+  attr("ag-footer-logo", "href", "HOME_URL");
+  attr("ag-privacy-link","href", "PRIVACY_URL");
+  attr("ag-terms-link",  "href", "TERMS_URL");
+
+  /* ══════════════════════════════════════════
+     ── منطق الحماية وإعادة التوجيه الذكي ──
+     ══════════════════════════════════════════ */
+
+  var TARGET_URL = window.location.href;
+  var isLoggedIn = localStorage.getItem("userLoggedIn") === "true";
+  var gate       = document.getElementById("auth-gate");
+
+  /* ── دالة إعادة التوجيه مع شاشة الترحيب ── */
+  function redirectAfterLogin(userName) {
+    var dest = sessionStorage.getItem("pendingRedirect") || TARGET_URL;
+    sessionStorage.removeItem("pendingRedirect");
+
+    /* إخفاء البطاقة وإظهار شاشة الترحيب */
+    var card = gate.querySelector(".ag-card");
+    if (card) {
+      card.innerHTML = [
+        '<div class="ag-card-body" style="padding:32px 20px;">',
+        '  <div style="width:56px;height:56px;background:rgba(37,99,235,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">',
+        '    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--linkC,#2563eb)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">',
+        '      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>',
+        '      <polyline points="22 4 12 14.01 9 11.01"></polyline>',
+        '    </svg>',
+        '  </div>',
+        '  <div style="font-size:16px;font-weight:600;color:var(--headC,#111);margin-bottom:6px;">',
+        '    أهلاً بك' + (userName ? '، ' + userName : '') + '!',
+        '  </div>',
+        '  <div style="font-size:13px;color:var(--bodyC,#555);margin-bottom:18px;">جارٍ إعادة التوجيه إلى الصفحة...</div>',
+        '  <div style="height:4px;background:var(--contentL,#e3e7ef);border-radius:99px;overflow:hidden;">',
+        '    <div id="ag-progress-bar" style="height:100%;width:0%;background:var(--linkC,#2563eb);border-radius:99px;transition:width 1.8s ease;"></div>',
+        '  </div>',
+        '</div>'
+      ].join("");
+
+      /* تشغيل شريط التقدم */
+      setTimeout(function () {
+        var bar = document.getElementById("ag-progress-bar");
+        if (bar) bar.style.width = "100%";
+      }, 50);
+    }
+
+    /* الانتقال للصفحة بعد 2 ثانية */
+    setTimeout(function () {
+      window.location.href = dest;
+    }, 2000);
+  }
+
+  /* ── دالة showLoginPopup المحلية (احتياطية إذا لم تكن معرّفة في القالب) ── */
+  if (typeof window.showLoginPopup !== "function") {
+    window.showLoginPopup = function () {
+      sessionStorage.setItem("pendingRedirect", TARGET_URL);
+      var cbu = encodeURIComponent(TARGET_URL);
+      window.open(
+        "/p/login.html?cbu=" + cbu,
+        "loginPopup",
+        "width=500,height=600,scrollbars=yes,resizable=yes"
+      );
+    };
+  } else {
+    /* القالب يملك showLoginPopup — احفظ الوجهة فقط */
+    var _origShowLogin = window.showLoginPopup;
+    window.showLoginPopup = function () {
+      sessionStorage.setItem("pendingRedirect", TARGET_URL);
+      _origShowLogin();
+    };
+  }
+
+  if (!isLoggedIn) {
+    /* ── إظهار شاشة الحماية وإخفاء باقي الصفحة ── */
+    gate.style.display = "flex";
+    document.querySelectorAll("body > *:not(#auth-gate):not(script):not(style):not(link)").forEach(function (el) {
+      el.style.setProperty("display", "none", "important");
+    });
+
+    /* ── استقبال loginSuccess من النافذة المنبثقة ── */
+    window.addEventListener("message", function (e) {
+      if (e.data && e.data.type === "loginSuccess" && e.data.user) {
+        var u = e.data.user;
+        localStorage.setItem("userLoggedIn", "true");
+        localStorage.setItem("userName",    u.name  || "");
+        localStorage.setItem("userEmail",   u.email || "");
+        localStorage.setItem("userPicture", u.image || "");
+        if (!localStorage.getItem("userJoinDate")) {
+          localStorage.setItem("userJoinDate", new Date().toISOString());
+        }
+        redirectAfterLogin(u.name);
+      }
+    });
+
+    /* ── استقبال تغيّر localStorage (تسجيل دخول من تبويب آخر) ── */
+    window.addEventListener("storage", function (e) {
+      if (e.key === "userLoggedIn" && e.newValue === "true") {
+        redirectAfterLogin(localStorage.getItem("userName"));
+      }
+    });
+
+  } else {
+    /* ── مسجّل الدخول: إخفاء شاشة الحماية فقط ── */
+    gate.style.display = "none";
+
+    /* إذا كان قادماً من إعادة توجيه → نظّف الوجهة المحفوظة */
+    sessionStorage.removeItem("pendingRedirect");
+  }
+})();
+</script>
+
+<!--
+  ═══════════════════════════════════════════════════════
+  ✅ انتهى كود الحماية — ضع كود الأداة أسفل هذا السطر
+  ═══════════════════════════════════════════════════════
+-->

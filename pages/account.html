@@ -1,0 +1,453 @@
+<!--
+  ╔══════════════════════════════════════════════════════╗
+  ║       صفحة إدارة الحساب — Modweeb Design            ║
+  ║  رابط بلوجر: /p/account.html                        ║
+  ║  تعرض بطاقة الحساب للمسجل، وbuttoncard لغيره        ║
+  ╚══════════════════════════════════════════════════════╝
+-->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+/* ==================== [1] إعدادات الصفحة الأساسية ==================== */
+html, body { margin: 0; padding: 0; overflow: hidden; }
+body { color: var(--bodyC); background: var(--bodyB); }
+.login-fullpage {
+  position: fixed; inset: 0; background: var(--bodyB); z-index: 9999;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  min-height: 100vh; height: 100vh; overflow-y: auto;
+}
+.content-wrapper { display: flex; justify-content: center; width: 100%; margin-top: 0.9rem; margin-bottom: 0.9rem; }
+
+/* ==================== [2] الهيدر والفوتر ==================== */
+header { background: var(--contentB); border-bottom: 1px solid var(--contentL); color: var(--bodyC); }
+header a { color: var(--headC); }
+footer { border-top: 1px solid var(--contentL); font-size: 13px; }
+footer a { color: var(--bodyC); font-size: 13px; }
+footer a:hover { color: var(--headC); }
+
+/* ==================== [3] الأيقونات ==================== */
+svg path, svg line, svg circle, svg rect { stroke: currentColor; }
+
+/* ==================== [4] البطاقات ==================== */
+.card {
+  background: var(--contentB); border-radius: 20px;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+  border: 1px solid var(--contentL); padding: 0; margin: 0 auto;
+}
+.card-content { padding: 13px 14px 13px 13px !important; }
+.bg-card { background: var(--contentB); }
+.rounded-md { border-radius: 0.37rem; }
+@media (max-width: 400px) {
+  .card { max-width: 90vw; }
+  .card-content { padding: 4px 2vw 5px 3vw !important; }
+}
+
+/* ==================== [5] الأزرار ==================== */
+.button {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 8px; font-size: 11px; font-weight: 500; transition: all .2s;
+  cursor: pointer; text-decoration: none; border: none; padding: 4px 7px; gap: 3px;
+}
+.button svg { width: 17px; height: 17px; margin-left: 5px; vertical-align: middle; }
+.button-black { background: #000; color: var(--white); }
+.button-black:hover { background: #262626; }
+.button-outline { background: 0 0; border: 1px solid var(--contentL); color: var(--bodyC); }
+.button-outline:hover { background: var(--bodyB); }
+
+/* ==================== [6] الروابط ==================== */
+.link { color: var(--linkC); text-decoration: underline; }
+.link:hover { color: var(--headC); }
+
+/* ==================== [7] بطاقة غير المسجل ==================== */
+.alert-card {
+  background: var(--contentB); border-radius: 20px; border: 1px solid var(--contentL);
+  overflow: hidden; max-width: 400px; margin: 0 auto;
+}
+.alert-card-header { padding: 16px 16px 0 16px; text-align: right; color: var(--bodyC); border-radius: 17px; }
+.alert-card-title { font-size: 16px; font-weight: 500; color: var(--headC); margin-bottom: 3px; }
+.alert-card-description { font-size: 14px; color: var(--bodyC); margin-bottom: 5px; }
+.alert-card-footer { border-top: 1px solid var(--contentL); padding: 12px 17px; display: flex; gap: 10px; color: var(--bodyC); font-size: 12px; }
+.alert-card-footer .button { flex: 1; }
+
+/* ==================== [8] نصوص مساعدة ==================== */
+.text-muted-foreground { color: var(--bodyC); }
+.wrap-break-word { word-wrap: break-word; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shrink-0 { flex-shrink: 0; }
+.compact-title { margin: 0 0 1px 0; line-height: 1.0; font-size: 18px; }
+.compact-subtitle { margin: 0 0 1px 0; line-height: 1.0; font-size: 14px; }
+.compact-section-title { margin: 8px 0 4px 0; font-size: 13px; }
+
+/* ==================== [9] Toast ==================== */
+.toast {
+  position: fixed; bottom: 17px; left: 50%; transform: translateX(-50%);
+  background: var(--notifB); color: var(--notifC); padding: 7px 12px;
+  border-radius: 14px; font-size: 14px; opacity: 0;
+  transition: opacity .3s ease-in-out; z-index: 1000000;
+}
+.toast.active { opacity: 1; }
+
+/* ==================== [10] زر الإعدادات ==================== */
+.settings-btn {
+  background: 0 0; border: 1px solid transparent; color: var(--bodyC);
+  font-size: 17px; cursor: pointer; padding: 3px 6px; border-radius: 5px;
+  transition: background .15s; margin: 0; display: flex; align-items: center; gap: 3px;
+}
+.settings-btn:hover { background: var(--bodyB); border: 1px solid var(--contentL); }
+.settings-btn svg { width: 15px; height: 15px; }
+
+/* ==================== [11] لوحة الإعدادات المنبثقة ==================== */
+.settings-panel {
+  display: none; position: absolute; top: 100%; left: 0; right: auto;
+  margin-top: 8px; background: var(--bodyB); border-radius: 12px;
+  padding: 10px 10px 2px 10px; text-align: right; border: 1px solid var(--contentL);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 280px; z-index: 10000;
+}
+.settings-panel.active { display: block; animation: fadeIn .25s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ==================== [12] حقول الإدخال ==================== */
+.input {
+  border: 1px solid var(--contentL); border-radius: 6px; padding: 5px 8px;
+  font-size: 13px; width: 100%; margin-top: 3px; margin-bottom: 7px;
+  background: var(--contentB); color: var(--bodyC);
+}
+
+/* تصغير أيقونات الجلسة */
+.text-sm svg.line:not(.button svg) { width: 18px !important; height: 18px !important; min-width: 20px !important; max-width: 20px !important; }
+</style>
+
+<!-- ==================== الهيكل الرئيسي ==================== -->
+<div class="login-fullpage">
+
+  <!-- الهيدر -->
+  <header class="sticky top-0 z-50 backdrop-blur-sm w-full relative">
+    <div class="flex items-center justify-between gap-4 px-5 py-2 max-w-5xl mx-auto">
+      <a class="flex items-center justify-center shrink-0 gap-3" href="/" style="color:var(--headC);">
+        <img src="https://blogger.googleusercontent.com/img/a/AVvXsEjlFuMZRXWUpxZK7ZWolRDFXmZuTNvT2uMzetcU_d2gXpLqZ_3B1-vl18e31nhKyo0C_6SOVsxszrL_FxtJ4YCma9QwhNB0BLiTcBNdqYTAuXStazw9Tds6ylCz0IpSEGZ2MnjCSXIfMtYxcnOV8H3sKC5szT2c3FCYDG_DvVIFtTvsgrzRWGO4kFURiO4=s1600"
+          class="size-8 rounded-sm object-cover" width="32" height="32" alt="Modweeb Design">
+        <span class="text-lg font-medium">تصميم مودويب</span>
+      </a>
+      <button class="button button-outline" id="showSettingsBtn" title="الإعدادات" style="color:var(--bodyC);">
+        <span style="font-size:10px;margin-left:4px;">الإعدادات</span>
+        <svg class="line" viewBox="0 0 24 24" width="15" height="15" fill="none">
+          <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke-miterlimit="10"></path>
+          <path d="M2 12.8799V11.1199C2 10.0799 2.85 9.21994 3.9 9.21994C5.71 9.21994 6.45 7.93994 5.54 6.36994C5.02 5.46994 5.33 4.29994 6.24 3.77994L7.97 2.78994C8.76 2.31994 9.78 2.59994 10.25 3.38994L10.36 3.57994C11.26 5.14994 12.74 5.14994 13.65 3.57994L13.76 3.38994C14.23 2.59994 15.25 2.31994 16.04 2.78994L17.77 3.77994C18.68 4.29994 18.99 5.46994 18.47 6.36994C17.56 7.93994 18.3 9.21994 20.11 9.21994C21.15 9.21994 22.01 10.0699 22.01 11.1199V12.8799C22.01 13.9199 21.16 14.7799 20.11 14.7799C18.3 14.7799 17.56 16.0599 18.47 17.6299C18.99 18.5399 18.68 19.6999 17.77 20.2199L16.04 21.2099C15.25 21.6799 14.23 21.3999 13.76 20.6099L13.65 20.4199C12.75 18.8499 11.27 18.8499 10.36 20.4199L10.25 20.6099C9.78 21.3999 8.76 21.6799 7.97 21.2099L6.24 20.2199C5.33 19.6999 5.02 18.5299 5.54 17.6299C6.45 16.0599 5.71 14.7799 3.9 14.7799C2.85 14.7799 2 13.9199 2 12.8799Z" stroke-miterlimit="10"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- لوحة الإعدادات -->
+    <div class="settings-panel" id="settingsPanel">
+      <form id="editProfileForm">
+        <label class="text-xs" style="color:var(--bodyC);">الاسم:
+          <input type="text" id="editName" class="input" value="" maxlength="32" required>
+        </label>
+        <div class="border-t my-3" style="border-color:var(--contentL);"></div>
+        <div class="text-xs mb-1" style="color:var(--headC);">تغيير الصورة:</div>
+        <label class="text-xs block mb-1" style="color:var(--bodyC);">(رفع صورة من جهازك)
+          <input type="file" id="editPic" accept="image/*" class="input" style="padding:0;">
+        </label>
+        <div class="border-t my-3" style="border-color:var(--contentL);"></div>
+        <label class="text-xs block" style="color:var(--bodyC);">(أو رابط مباشر للصورة)
+          <input type="url" id="editPicUrl" class="input" placeholder="https://example.com/avatar.jpg">
+        </label>
+        <button type="submit" class="button button-black w-full mt-4" style="background:var(--linkB);color:var(--white);width:100%;padding:8px;">حفظ التعديلات</button>
+      </form>
+    </div>
+  </header>
+
+  <!-- محتوى بطاقة الحساب -->
+  <div class="content-wrapper">
+    <div class="mx-auto w-full max-w-md">
+      <div id="accountCardContainer" class="w-full max-w-sm mx-auto"></div>
+    </div>
+  </div>
+
+  <!-- الفوتر -->
+  <footer class="w-full">
+    <div class="flex items-center flex-col justify-between gap-4 px-5 py-6 max-w-5xl mx-auto sm:flex-row">
+      <div class="flex items-center gap-2">
+        <a class="flex items-center gap-1.5 shrink-0" href="/" style="color:var(--headC);">
+          <img src="https://blogger.googleusercontent.com/img/a/AVvXsEjlFuMZRXWUpxZK7ZWolRDFXmZuTNvT2uMzetcU_d2gXpLqZ_3B1-vl18e31nhKyo0C_6SOVsxszrL_FxtJ4YCma9QwhNB0BLiTcBNdqYTAuXStazw9Tds6ylCz0IpSEGZ2MnjCSXIfMtYxcnOV8H3sKC5szT2c3FCYDG_DvVIFtTvsgrzRWGO4kFURiO4=s1600"
+            class="size-6 rounded-sm" width="25" height="25" alt="Modweeb Design">
+          <span style="font-size:13px;font-weight:600;">تصميم مودويب</span>
+        </a>
+        <a class="text-sm opacity-85 hover:underline" href="/p/privacy-policy.html" style="color:var(--bodyC);">خصوصية</a>
+        <a class="text-sm opacity-85 hover:underline" href="/p/terms.html" style="color:var(--bodyC);">شروط</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div id="toastMessage" class="toast"></div>
+
+<!-- ==================== السكريبت الرئيسي ==================== -->
+<script>
+/* ==================== [1] تسجيل الخروج عبر URL ==================== */
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("logout")) {
+    ["userLoggedIn","userName","userEmail","userPicture","userJoinDate","userSessions"]
+      .forEach(k => localStorage.removeItem(k));
+    window.location.replace(window.location.pathname);
+  }
+})();
+
+/* ==================== [2] Toast ==================== */
+function notify(t) {
+  const e = document.getElementById("toastMessage");
+  if (e) { e.innerText = t; e.classList.add("active"); setTimeout(() => e.classList.remove("active"), 3000); }
+}
+
+/* ==================== [3] معلومات النظام ==================== */
+function getOS() {
+  const ua = navigator.userAgent;
+  if (ua.includes("Windows")) return "ويندوز";
+  if (ua.includes("Mac")) return "ماك";
+  if (ua.includes("Linux")) return "لينكس";
+  if (ua.includes("Android")) return "أندرويد";
+  if (ua.includes("iPhone") || ua.includes("iPad")) return "آيفون/آيباد";
+  return "غير معروف";
+}
+async function getIP() {
+  try { const r = await fetch("https://api.ipify.org?format=json"); const d = await r.json(); return d.ip; }
+  catch { return "غير معروف"; }
+}
+function getCurrentTime() {
+  return new Date().toLocaleString("en-US", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" });
+}
+
+/* ==================== [4] بيانات المستخدم ==================== */
+function getUserData() {
+  return {
+    isLoggedIn: localStorage.getItem("userLoggedIn") === "true",
+    name: localStorage.getItem("userName"),
+    picture: localStorage.getItem("userPicture"),
+    email: localStorage.getItem("userEmail"),
+    joinDate: localStorage.getItem("userJoinDate")
+  };
+}
+function formatDate(d) {
+  if (!d || d === "undefined" || d === "null") return "غير محدد";
+  try {
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return "غير محدد";
+    return dt.toLocaleDateString("en-US", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" }).replace(",", "");
+  } catch { return "غير محدد"; }
+}
+
+/* ==================== [5] إدارة الجلسات ==================== */
+function getSessions() { try { const s = localStorage.getItem("userSessions"); return s ? JSON.parse(s) : []; } catch { return []; } }
+function saveSessions(ss) { localStorage.setItem("userSessions", JSON.stringify(ss)); }
+function removeSession(i) { const ss = getSessions(); ss.splice(i, 1); saveSessions(ss); updateAccountInfo(); notify("تم إزالة الجلسة بنجاح"); }
+function addCurrentSession() {
+  const cs = { id: Date.now(), time: getCurrentTime(), os: getOS(), ip: "جاري التحميل...", isCurrent: true };
+  getIP().then(ip => {
+    cs.ip = ip;
+    const ss = getSessions();
+    const filtered = ss.filter(s => !s.isCurrent);
+    filtered.push(cs);
+    saveSessions(filtered);
+    updateAccountInfo();
+  });
+  return cs;
+}
+window.removeSession = removeSession;
+
+/* ==================== [6] إعدادات الملف الشخصي ==================== */
+function setupEditProfileListeners() {
+  const settingsBtn = document.getElementById("showSettingsBtn");
+  const settingsPanel = document.getElementById("settingsPanel");
+  const editForm = document.getElementById("editProfileForm");
+  const editPicFile = document.getElementById("editPic");
+  const editPicUrl = document.getElementById("editPicUrl");
+
+  if (settingsBtn && settingsPanel) {
+    settingsBtn.onclick = (e) => { e.stopPropagation(); settingsPanel.classList.toggle("active"); };
+    document.addEventListener("click", (e) => {
+      if (settingsPanel && settingsBtn && !settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
+        settingsPanel.classList.remove("active");
+      }
+    });
+  }
+
+  const { name } = getUserData();
+  const nameInput = document.getElementById("editName");
+  if (nameInput && name) nameInput.value = name;
+
+  if (editPicFile) {
+    editPicFile.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const avatarImg = document.getElementById("avatarImg");
+          if (avatarImg) avatarImg.src = ev.target.result;
+          if (editPicUrl) editPicUrl.value = "";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  if (editPicUrl) {
+    editPicUrl.addEventListener("input", (e) => {
+      const avatarImg = document.getElementById("avatarImg");
+      if (avatarImg) avatarImg.src = e.target.value;
+      if (editPicFile) editPicFile.value = "";
+    });
+  }
+
+  if (editForm) {
+    editForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const newName = document.getElementById("editName").value.trim();
+      const file = editPicFile ? editPicFile.files[0] : null;
+      const url = editPicUrl ? editPicUrl.value.trim() : "";
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          localStorage.setItem("userPicture", ev.target.result);
+          localStorage.setItem("userName", newName);
+          updateAccountInfo();
+          notify("تم حفظ التعديلات بنجاح!");
+          if (settingsPanel) settingsPanel.classList.remove("active");
+        };
+        reader.readAsDataURL(file);
+      } else if (url) {
+        localStorage.setItem("userPicture", url);
+        localStorage.setItem("userName", newName);
+        updateAccountInfo();
+        notify("تم حفظ التعديلات بنجاح!");
+        if (settingsPanel) settingsPanel.classList.remove("active");
+      } else {
+        localStorage.setItem("userName", newName);
+        updateAccountInfo();
+        notify("تم حفظ الاسم بنجاح!");
+        if (settingsPanel) settingsPanel.classList.remove("active");
+      }
+    });
+  }
+}
+
+/* ==================== [7] بناء بطاقة الحساب ==================== */
+function updateAccountInfo() {
+  const container = document.getElementById("accountCardContainer");
+  if (!container) return;
+  const { isLoggedIn, name, picture, email, joinDate } = getUserData();
+
+  let finalJoinDate = joinDate;
+  if (!finalJoinDate || finalJoinDate === "undefined" || finalJoinDate === "null") {
+    finalJoinDate = new Date().toISOString();
+    localStorage.setItem("userJoinDate", finalJoinDate);
+  }
+
+  if (isLoggedIn && name) {
+    /* ---- مستخدم مسجل: عرض بطاقة الحساب ---- */
+    let sessions = getSessions();
+    if (!sessions.find(s => s.isCurrent)) { addCurrentSession(); sessions = getSessions(); }
+
+    let sessionsHTML = "";
+    sessions.sort((a, b) => b.id - a.id).forEach((s, i) => {
+      const originalIndex = getSessions().findIndex(ss => ss.id === s.id);
+      sessionsHTML += `
+        <div class="flex flex-wrap gap-2 items-center justify-between p-3 border rounded-md shadow-sm overflow-hidden" style="background:var(--contentB);border-color:var(--contentL);">
+          <div class="overflow-hidden">
+            <div class="text-sm flex items-center gap-1.5" style="color:var(--bodyC);">
+              <svg class="line shrink-0" viewBox="0 0 24 24" width="14" height="14"><path d="M20.75 13.25C20.75 18.08 16.83 22 12 22C7.17 22 3.25 18.08 3.25 13.25C3.25 8.42 7.17 4.5 12 4.5C16.83 4.5 20.75 8.42 20.75 13.25Z"></path><path d="M12 8V13"></path><path d="M9 2H15" stroke-miterlimit="10"></path></svg>
+              <span class="truncate">الوقت: ${s.time}</span>
+            </div>
+            <div class="text-sm flex items-center gap-1.5" style="color:var(--bodyC);">
+              <svg class="line shrink-0" viewBox="0 0 24 24" width="14" height="14"><path d="M10 16.95H6.21C2.84 16.95 2 16.11 2 12.74V6.74003C2 3.37003 2.84 2.53003 6.21 2.53003H16.74C20.11 2.53003 20.95 3.37003 20.95 6.74003"></path><path d="M22 12.8V18.51C22 20.88 21.41 21.47 19.04 21.47H15.49C13.12 21.47 12.53 20.88 12.53 18.51V12.8C12.53 10.43 13.12 9.83997 15.49 9.83997H19.04C21.41 9.83997 22 10.43 22 12.8Z"></path><path d="M17.2445 18.25H17.2535"></path></svg>
+              <span class="truncate">النظام: ${s.os}</span>
+            </div>
+            <div class="text-sm flex items-center gap-1.5" style="color:var(--bodyC);">
+              <svg class="line shrink-0" viewBox="0 0 24 24" width="14" height="14"><path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z"></path></svg>
+              <span class="truncate">IP: ${s.ip}</span>
+            </div>
+          </div>
+          <div class="flex gap-2 shrink-0">
+            ${s.isCurrent ? '<span class="text-xs px-2 py-1 rounded-full" style="background:rgba(37,99,235,.1);color:var(--linkC);">الجلسة الحالية</span>' : `<button onclick="removeSession(${originalIndex})" class="button button-outline" style="border-radius:8px;color:var(--danger,#ef4444);border-color:var(--danger,#ef4444);font-size:11px;padding:3px 8px;">إزالة</button>`}
+          </div>
+        </div>`;
+    });
+
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-content">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="shrink-0 size-9 rounded-full overflow-hidden" style="background:var(--contentBa);border:1px solid var(--contentL);width:40px;height:40px;">
+              ${picture && picture !== "undefined" && picture !== "null"
+                ? `<img id="avatarImg" src="${picture}" alt="${name}" style="width:100%;height:100%;object-fit:cover;">`
+                : `<div id="avatarImg" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:var(--linkC);">${name ? name[0].toUpperCase() : "?"}</div>`}
+            </div>
+            <div class="overflow-hidden">
+              <p class="compact-title font-semibold truncate" style="color:var(--headC);">${name || "المستخدم"}</p>
+              <p class="compact-subtitle truncate" style="color:var(--bodyC);font-size:12px;">${email || ""}</p>
+            </div>
+          </div>
+          <div class="border-t pt-2" style="border-color:var(--contentL);">
+            <p class="compact-section-title font-semibold" style="color:var(--headC);">معلومات الحساب</p>
+            <div class="grid gap-2">
+              <div class="text-sm flex items-center gap-1.5" style="color:var(--bodyC);">
+                <svg class="line shrink-0" viewBox="0 0 24 24" width="14" height="14"><path d="M8 2V5"></path><path d="M16 2V5"></path><path d="M3.5 9.09H20.5"></path><path d="M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z"></path></svg>
+                <span>تاريخ الانضمام: ${formatDate(finalJoinDate)}</span>
+              </div>
+            </div>
+          </div>
+          <div class="border-t pt-2 mt-2" style="border-color:var(--contentL);">
+            <p class="compact-section-title font-semibold" style="color:var(--headC);">الجلسات النشطة</p>
+            <div class="grid gap-2">${sessionsHTML}</div>
+          </div>
+        </div>
+        <div class="border-t p-3 flex justify-between gap-2" style="border-color:var(--contentL);">
+          <button onclick="window.location.href='/?logout'" class="button button-outline" style="font-size:11px;border-radius:10px;padding:5px 12px;color:var(--danger,#ef4444);border-color:var(--danger,#ef4444);">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.44 14.62L20 12.06L17.44 9.5"></path><path d="M9.76 12.06H19.93"></path><path d="M11.76 20C7.34 20 3.76 17 3.76 12C3.76 7 7.34 4 11.76 4"></path></svg>
+            تسجيل الخروج
+          </button>
+        </div>
+      </div>`;
+    setupEditProfileListeners();
+  } else {
+    /* ---- مستخدم غير مسجل: عرض alert-card ---- */
+    container.innerHTML = `
+      <div class="alert-card">
+        <div class="alert-card-header">
+          <div class="alert-card-title">إدارة الحساب</div>
+          <div class="alert-card-description">يجب تسجيل الدخول لعرض بيانات حسابك وإدارة جلساتك.</div>
+        </div>
+        <div class="alert-card-footer">
+          <button class="button button-black" onclick="showLoginPopup()" style="border-radius:12px;padding:8px 12px;font-size:12px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.68 14.62L14.24 12.06L11.68 9.5"></path><path d="M4 12.06H14.17"></path><path d="M12 4C16.42 4 20 7 20 12C20 17 16.42 20 12 20"></path></svg>
+            تسجيل الدخول
+          </button>
+          <a href="/" class="button button-outline" style="border-radius:12px;padding:8px 12px;font-size:12px;">الرئيسية</a>
+        </div>
+      </div>`;
+  }
+}
+
+/* ==================== [8] مستمعو الأحداث ==================== */
+window.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "loginSuccess") {
+    const user = event.data.user;
+    if (user) {
+      localStorage.setItem("userLoggedIn", "true");
+      localStorage.setItem("userName", user.name);
+      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("userPicture", user.image || "");
+      if (!localStorage.getItem("userJoinDate") || localStorage.getItem("userJoinDate") === "null") {
+        localStorage.setItem("userJoinDate", new Date().toISOString());
+      }
+      addCurrentSession();
+      updateAccountInfo();
+      notify("تم تسجيل الدخول بنجاح!");
+    }
+  }
+});
+window.addEventListener("pageshow", (e) => { if (e.persisted) updateAccountInfo(); });
+document.addEventListener("DOMContentLoaded", updateAccountInfo);
+window.addEventListener("storage", updateAccountInfo);
+setTimeout(() => addCurrentSession(), 500);
+</script>
